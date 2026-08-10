@@ -1,23 +1,31 @@
 <?php
 
+$driver  = $_ENV['DB_DRIVER'] ?? 'sqlite';
+
+// DB_PATH が相対パスの場合はプロジェクトルート基準の絶対パスに変換する
+$dbPath = $_ENV['DB_PATH'] ?? './database/tightpress.sqlite';
+if (!str_starts_with($dbPath, '/')) {
+    $dbPath = dirname(__DIR__) . '/' . ltrim($dbPath, './');
+}
+
 return [
-    'driver' => 'sqlite',   // 'sqlite' | 'mysql' | 'pgsql'
+    'driver' => $driver,
     'sqlite' => [
-        'path' => __DIR__ . '/../database/tightpress.sqlite',
+        'path' => $dbPath,
     ],
     'mysql'  => [
-        'host'     => '127.0.0.1',
-        'port'     => 3306,
-        'database' => 'tightpress',
-        'username' => 'root',
-        'password' => '',
-        'charset'  => 'utf8mb4',
+        'host'     => $_ENV['DB_HOST']    ?? '127.0.0.1',
+        'port'     => (int) ($_ENV['DB_PORT'] ?? 3306),
+        'database' => $_ENV['DB_NAME']    ?? 'tightpress',
+        'username' => $_ENV['DB_USER']    ?? 'root',
+        'password' => $_ENV['DB_PASS']    ?? '',
+        'charset'  => $_ENV['DB_CHARSET'] ?? 'utf8mb4',
     ],
     'pgsql'  => [
-        'host'     => '127.0.0.1',
-        'port'     => 5432,
-        'database' => 'tightpress',
-        'username' => 'postgres',
-        'password' => '',
+        'host'     => $_ENV['DB_HOST'] ?? '127.0.0.1',
+        'port'     => (int) ($_ENV['DB_PORT'] ?? 5432),
+        'database' => $_ENV['DB_NAME'] ?? 'tightpress',
+        'username' => $_ENV['DB_USER'] ?? 'postgres',
+        'password' => $_ENV['DB_PASS'] ?? '',
     ],
 ];

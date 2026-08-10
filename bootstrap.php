@@ -3,6 +3,7 @@
 // Composer オートローダーを読み込む
 require_once __DIR__ . '/vendor/autoload.php';
 
+use TightPress\Core\Config\DotEnv;
 use TightPress\Core\Application;
 use TightPress\Core\Config\Config;
 use TightPress\Core\Database\Connection;
@@ -15,6 +16,9 @@ use TightPress\Core\Template\ThemeLoader;
 use TightPress\Core\Template\TemplateEngine;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
+
+// .env を config/ ファイルより先に読み込む
+DotEnv::load(__DIR__ . '/.env');
 
 // DIコンテナ（アプリケーション本体）を生成する
 $app = new Application();
