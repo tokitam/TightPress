@@ -4,6 +4,14 @@
 define('ROOT_DIR',   dirname(__DIR__));
 define('PUBLIC_DIR', __DIR__);
 
+// PHP 組み込みサーバー用: 実在する静的ファイルはそのまま配信する
+if (PHP_SAPI === 'cli-server') {
+    $staticFile = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if (is_file($staticFile)) {
+        return false;
+    }
+}
+
 $app = require ROOT_DIR . '/bootstrap.php';
 
 use TightPress\Core\Http\Request;

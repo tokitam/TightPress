@@ -72,4 +72,4 @@ if ($seed) {
 }
 
 echo "\nセットアップ完了！\n";
-echo "起動: php -S localhost:8080 index.php\n";
+echo "起動: php -S localhost:8080 -t public public/index.php\n";
