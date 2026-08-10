@@ -1,15 +1,12 @@
 Options -Indexes
 RewriteEngine On
 
-# uploads/ は直接配信する
-RewriteRule ^uploads/ - [L]
-
-# vendor/ は外部からアクセス不可にする
-RewriteRule ^vendor/ - [F,L]
+# uploads/ と themes/ 以下の静的ファイルはそのまま配信する
+RewriteRule ^(uploads|themes)/ - [L]
 
 # 存在するファイル・ディレクトリはそのまま配信する
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# 全リクエストを index.php に転送する
+# それ以外は index.php に転送する
 RewriteRule ^ index.php [L]
