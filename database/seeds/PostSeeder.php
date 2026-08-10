@@ -82,8 +82,9 @@ class PostSeeder
         // 各記事を順に処理する
         foreach ($posts as $post) {
             // slug が既に存在するか確認する
+            $t        = $this->connection->getPrefix() . 'posts';
             $existing = $this->connection->select(
-                'SELECT id FROM posts WHERE slug = ?',
+                "SELECT id FROM {$t} WHERE slug = ?",
                 [$post['slug']]
             );
 
@@ -96,10 +97,10 @@ class PostSeeder
             // posts テーブルへ INSERT する
             // author_id・comment_status・thumbnail_id は NULL で投入する
             $this->connection->insert(
-                'INSERT INTO posts
+                "INSERT INTO {$t}
                     (author_id, slug, title, content, excerpt, status, comment_status, thumbnail_id, published_at, created_at, updated_at)
                 VALUES
-                    (NULL, ?, ?, ?, ?, ?, \'open\', NULL, ?, ?, ?)',
+                    (NULL, ?, ?, ?, ?, ?, 'open', NULL, ?, ?, ?)",
                 [
                     $post['slug'],
                     $post['title'],

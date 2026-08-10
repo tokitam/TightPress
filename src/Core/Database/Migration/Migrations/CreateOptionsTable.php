@@ -27,16 +27,17 @@ class CreateOptionsTable implements MigrationInterface
      */
     public function up(): void
     {
-        // options テーブルを作成する（既に存在する場合はスキップ）
-        $this->connection->getPdo()->exec(
-            'CREATE TABLE IF NOT EXISTS options (
+        $prefix = $this->connection->getPrefix();
+
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$prefix}options (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 name       VARCHAR(191) NOT NULL UNIQUE,
                 value      TEXT,
                 autoload   BOOLEAN NOT NULL DEFAULT 1,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL
-            )'
+            )"
         );
     }
 
@@ -47,6 +48,7 @@ class CreateOptionsTable implements MigrationInterface
      */
     public function down(): void
     {
-        $this->connection->getPdo()->exec('DROP TABLE IF EXISTS options');
+        $prefix = $this->connection->getPrefix();
+        $this->connection->execute("DROP TABLE IF EXISTS {$prefix}options");
     }
 }

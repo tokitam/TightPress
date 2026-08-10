@@ -43,6 +43,11 @@ class MySQLDriver extends AbstractDriver
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             \PDO::ATTR_EMULATE_PREPARES   => false,
         ]);
+
+        // プレフィックスをバリデーションして保持する
+        $prefix = $config['prefix'] ?? 'tp_';
+        $this->validatePrefix($prefix);
+        $this->prefix = $prefix;
     }
 
     /**

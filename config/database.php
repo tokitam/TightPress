@@ -10,6 +10,7 @@ if (!str_starts_with($dbPath, '/')) {
 
 return [
     'driver' => $driver,
+    'prefix' => $_ENV['DB_PREFIX'] ?? 'tp_',
     'sqlite' => [
         'path' => $dbPath,
     ],

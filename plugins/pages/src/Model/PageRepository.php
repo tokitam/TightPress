@@ -29,13 +29,12 @@ class PageRepository
      */
     public function findBySlug(string $slug): ?Page
     {
-        // スラッグが一致するレコードを1件取得する
+        $t    = $this->connection->getPrefix() . 'pages';
         $rows = $this->connection->select(
-            'SELECT * FROM pages WHERE slug = ? LIMIT 1',
+            "SELECT * FROM {$t} WHERE slug = ? LIMIT 1",
             [$slug]
         );
 
-        // レコードが存在しない場合は null を返す
         if (empty($rows)) {
             return null;
         }
@@ -51,13 +50,12 @@ class PageRepository
      */
     public function findById(int $id): ?Page
     {
-        // IDが一致するレコードを1件取得する
+        $t    = $this->connection->getPrefix() . 'pages';
         $rows = $this->connection->select(
-            'SELECT * FROM pages WHERE id = ? LIMIT 1',
+            "SELECT * FROM {$t} WHERE id = ? LIMIT 1",
             [$id]
         );
 
-        // レコードが存在しない場合は null を返す
         if (empty($rows)) {
             return null;
         }
@@ -73,13 +71,12 @@ class PageRepository
      */
     public function findPublished(): array
     {
-        // status='publish' の固定ページを sort_order 昇順で全件取得する
+        $t    = $this->connection->getPrefix() . 'pages';
         $rows = $this->connection->select(
-            'SELECT * FROM pages WHERE status = ? ORDER BY sort_order ASC',
+            "SELECT * FROM {$t} WHERE status = ? ORDER BY sort_order ASC",
             ['publish']
         );
 
-        // 各行を Page エンティティに変換して返す
         return array_map(
             fn(array $row) => $this->hydrate($row),
             $rows
@@ -95,17 +92,14 @@ class PageRepository
      */
     public function save(Page $page): Page
     {
-        // published_at を文字列に変換する（null の場合はそのまま null）
+        $t           = $this->connection->getPrefix() . 'pages';
         $publishedAt = $page->publishedAt?->format('Y-m-d H:i:s');
-
-        // 現在日時を文字列で取得する
-        $now = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
+        $now         = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
 
         if ($page->id === 0) {
-            // id が 0 の場合は新規 INSERT を実行する
             $id = $this->connection->insert(
-                'INSERT INTO pages (parent_id, author_id, slug, title, content, status, thumbnail_id, sort_order, template, published_at, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                "INSERT INTO {$t} (parent_id, author_id, slug, title, content, status, thumbnail_id, sort_order, template, published_at, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [
                     $page->parentId,
                     $page->authorId,
@@ -122,14 +116,12 @@ class PageRepository
                 ]
             );
 
-            // 新しい ID で Page エンティティを生成して返す
             return $this->findById($id);
         }
 
-        // id が 0 以外の場合は UPDATE を実行する
         $this->connection->update(
-            'UPDATE pages SET parent_id = ?, author_id = ?, slug = ?, title = ?, content = ?, status = ?, thumbnail_id = ?, sort_order = ?, template = ?, published_at = ?, updated_at = ?
-             WHERE id = ?',
+            "UPDATE {$t} SET parent_id = ?, author_id = ?, slug = ?, title = ?, content = ?, status = ?, thumbnail_id = ?, sort_order = ?, template = ?, published_at = ?, updated_at = ?
+             WHERE id = ?",
             [
                 $page->parentId,
                 $page->authorId,
@@ -146,7 +138,6 @@ class PageRepository
             ]
         );
 
-        // 更新後の最新データを取得して返す
         return $this->findById($page->id);
     }
 
@@ -157,9 +148,9 @@ class PageRepository
      */
     public function delete(int $id): void
     {
-        // 指定IDの固定ページを削除する
+        $t = $this->connection->getPrefix() . 'pages';
         $this->connection->delete(
-            'DELETE FROM pages WHERE id = ?',
+            "DELETE FROM {$t} WHERE id = ?",
             [$id]
         );
     }
@@ -173,18 +164,13 @@ class PageRepository
      */
     private function hydrate(array $row): Page
     {
-        // published_at が設定されている場合のみ DateTimeImmutable に変換する
         $publishedAt = null;
         if (!empty($row['published_at'])) {
             $publishedAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $row['published_at']);
-            // 変換に失敗した場合は null のまま
             $publishedAt = $publishedAt !== false ? $publishedAt : null;
         }
 
-        // created_at を DateTimeImmutable に変換する
         $createdAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $row['created_at']);
-
-        // updated_at を DateTimeImmutable に変換する
         $updatedAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $row['updated_at']);
 
         return new Page(

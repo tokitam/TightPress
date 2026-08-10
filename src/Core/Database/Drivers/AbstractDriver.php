@@ -21,6 +21,13 @@ abstract class AbstractDriver implements ConnectionInterface
     protected \PDO $pdo;
 
     /**
+     * テーブルプレフィックス（例: 'tp_'）。
+     *
+     * @var string
+     */
+    protected string $prefix = 'tp_';
+
+    /**
      * プリペアドステートメントで SELECT を実行して結果行の配列を返す。
      *
      * @param  string $sql      実行する SELECT 文
@@ -65,6 +72,46 @@ abstract class AbstractDriver implements ConnectionInterface
         $stmt->execute($bindings);
 
         return $stmt->rowCount();
+    }
+
+    /**
+     * DDL・DML を汎用的に実行して影響行数を返す。
+     *
+     * @param  string $sql      実行する SQL 文
+     * @param  array<int|string, mixed> $bindings プレースホルダーのバインド値
+     * @return int 影響行数
+     */
+    public function execute(string $sql, array $bindings = []): int
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($bindings);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * テーブルプレフィックスを返す。
+     *
+     * @return string プレフィックス文字列
+     */
+    public function getPrefix(): string
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * プレフィックスを英数字・アンダースコアのみに制限してバリデーションする。
+     *
+     * @param  string $prefix 検証するプレフィックス
+     * @throws \InvalidArgumentException 不正な文字が含まれている場合
+     */
+    protected function validatePrefix(string $prefix): void
+    {
+        if ($prefix !== '' && !preg_match('/^[a-zA-Z0-9_]+$/', $prefix)) {
+            throw new \InvalidArgumentException(
+                "テーブルプレフィックスは英数字とアンダースコアのみ使用できます: '{$prefix}'"
+            );
+        }
     }
 
     /**
