@@ -28,9 +28,10 @@ class CreateTaxonomiesTable implements MigrationInterface
      */
     public function up(): void
     {
-        // taxonomies テーブルを作成する（既に存在する場合はスキップ）
-        $this->connection->getPdo()->exec(
-            'CREATE TABLE IF NOT EXISTS taxonomies (
+        $prefix = $this->connection->getPrefix();
+
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$prefix}taxonomies (
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
                 slug         VARCHAR(191) NOT NULL UNIQUE,
                 label        VARCHAR(255) NOT NULL,
@@ -38,7 +39,7 @@ class CreateTaxonomiesTable implements MigrationInterface
                 hierarchical BOOLEAN NOT NULL DEFAULT 0,
                 created_at   DATETIME NOT NULL,
                 updated_at   DATETIME NOT NULL
-            )'
+            )"
         );
     }
 
@@ -51,6 +52,7 @@ class CreateTaxonomiesTable implements MigrationInterface
      */
     public function down(): void
     {
-        $this->connection->getPdo()->exec('DROP TABLE IF EXISTS taxonomies');
+        $prefix = $this->connection->getPrefix();
+        $this->connection->execute("DROP TABLE IF EXISTS {$prefix}taxonomies");
     }
 }

@@ -27,20 +27,21 @@ class CreateUsersTable implements MigrationInterface
      */
     public function up(): void
     {
-        // users テーブルを作成する（既に存在する場合はスキップ）
-        $this->connection->getPdo()->exec(
-            'CREATE TABLE IF NOT EXISTS users (
+        $prefix = $this->connection->getPrefix();
+
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$prefix}users (
                 id            INTEGER PRIMARY KEY AUTOINCREMENT,
                 login         VARCHAR(60) NOT NULL UNIQUE,
                 email         VARCHAR(100) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
                 display_name  VARCHAR(250),
-                role          VARCHAR(20) NOT NULL DEFAULT \'subscriber\',
-                status        VARCHAR(20) NOT NULL DEFAULT \'active\',
+                role          VARCHAR(20) NOT NULL DEFAULT 'subscriber',
+                status        VARCHAR(20) NOT NULL DEFAULT 'active',
                 registered_at DATETIME NOT NULL,
                 created_at    DATETIME NOT NULL,
                 updated_at    DATETIME NOT NULL
-            )'
+            )"
         );
     }
 
@@ -51,6 +52,7 @@ class CreateUsersTable implements MigrationInterface
      */
     public function down(): void
     {
-        $this->connection->getPdo()->exec('DROP TABLE IF EXISTS users');
+        $prefix = $this->connection->getPrefix();
+        $this->connection->execute("DROP TABLE IF EXISTS {$prefix}users");
     }
 }

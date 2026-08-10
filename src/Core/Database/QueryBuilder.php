@@ -71,14 +71,15 @@ class QueryBuilder
     /**
      * 操作対象のテーブルを指定する。
      *
-     * @param  string $table テーブル名
+     * @param  string $table テーブルの論理名（プレフィックスは自動付与される）
+     * @param  bool   $raw   true にするとプレフィックスを付与しない（JOIN 先テーブル等に使用）
      * @return static
      */
-    public function table(string $table): static
+    public function table(string $table, bool $raw = false): static
     {
         // イミュータブルな操作のため clone して返す
         $clone        = clone $this;
-        $clone->table = $table;
+        $clone->table = $raw ? $table : $this->connection->getPrefix() . $table;
 
         return $clone;
     }

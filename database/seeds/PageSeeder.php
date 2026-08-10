@@ -72,8 +72,9 @@ class PageSeeder
         // 各固定ページを順に処理する
         foreach ($pages as $page) {
             // slug が既に存在するか確認する
+            $t        = $this->connection->getPrefix() . 'pages';
             $existing = $this->connection->select(
-                'SELECT id FROM pages WHERE slug = ?',
+                "SELECT id FROM {$t} WHERE slug = ?",
                 [$page['slug']]
             );
 
@@ -86,10 +87,10 @@ class PageSeeder
             // pages テーブルへ INSERT する
             // parent_id・author_id・thumbnail_id・template は NULL で投入する
             $this->connection->insert(
-                'INSERT INTO pages
+                "INSERT INTO {$t}
                     (parent_id, author_id, slug, title, content, status, thumbnail_id, sort_order, template, published_at, created_at, updated_at)
                 VALUES
-                    (NULL, NULL, ?, ?, ?, ?, NULL, ?, NULL, ?, ?, ?)',
+                    (NULL, NULL, ?, ?, ?, ?, NULL, ?, NULL, ?, ?, ?)",
                 [
                     $page['slug'],
                     $page['title'],

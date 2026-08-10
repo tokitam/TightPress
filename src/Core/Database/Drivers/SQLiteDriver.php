@@ -31,6 +31,11 @@ class SQLiteDriver extends AbstractDriver
 
         // WAL（Write-Ahead Logging）モードを有効化して書き込み並行性を高める
         $this->pdo->exec('PRAGMA journal_mode=WAL;');
+
+        // プレフィックスをバリデーションして保持する
+        $prefix = $config['prefix'] ?? 'tp_';
+        $this->validatePrefix($prefix);
+        $this->prefix = $prefix;
     }
 
     /**

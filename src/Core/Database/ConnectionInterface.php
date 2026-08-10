@@ -47,6 +47,17 @@ interface ConnectionInterface
     public function delete(string $sql, array $bindings = []): int;
 
     /**
+     * DDL・DML を汎用的に実行して影響行数を返す。
+     *
+     * CREATE TABLE / DROP TABLE などのスキーマ操作に使用する。
+     *
+     * @param  string $sql      実行する SQL 文
+     * @param  array<int|string, mixed> $bindings プレースホルダーのバインド値
+     * @return int 影響行数（DDL では 0 が返ることがある）
+     */
+    public function execute(string $sql, array $bindings = []): int;
+
+    /**
      * トランザクション内でコールバックを実行する。
      *
      * コールバックが例外を投げた場合はロールバックされ、例外が再スローされる。
@@ -63,6 +74,13 @@ interface ConnectionInterface
      * @return string 'sqlite' | 'mysql' | 'pgsql' のいずれか
      */
     public function getDriverName(): string;
+
+    /**
+     * テーブルプレフィックスを返す。
+     *
+     * @return string プレフィックス文字列（例: 'tp_'）。プレフィックスなしの場合は空文字
+     */
+    public function getPrefix(): string;
 
     /**
      * 生の PDO オブジェクトを返す。

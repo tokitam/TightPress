@@ -40,6 +40,11 @@ class PostgreSQLDriver extends AbstractDriver
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
+
+        // プレフィックスをバリデーションして保持する
+        $prefix = $config['prefix'] ?? 'tp_';
+        $this->validatePrefix($prefix);
+        $this->prefix = $prefix;
     }
 
     /**

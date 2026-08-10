@@ -29,42 +29,37 @@ class CreatePagesTables
      */
     public function up(): void
     {
+        $p = $this->connection->getPrefix();
+
         // pages テーブルを作成する
-        // parent_id は自己参照外部キー（親ページが削除された場合は NULL にする）
-        // slug は固定ページのURLスラッグで一意制約を持つ
-        $this->connection->update(
-            <<<SQL
-            CREATE TABLE IF NOT EXISTS pages (
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$p}pages (
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
-                parent_id    INTEGER REFERENCES pages(id) ON DELETE SET NULL,
-                author_id    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+                parent_id    INTEGER REFERENCES {$p}pages(id) ON DELETE SET NULL,
+                author_id    INTEGER REFERENCES {$p}users(id) ON DELETE SET NULL,
                 slug         VARCHAR(191) NOT NULL UNIQUE,
                 title        VARCHAR(500) NOT NULL,
                 content      LONGTEXT,
                 status       VARCHAR(20) NOT NULL DEFAULT 'draft',
-                thumbnail_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
+                thumbnail_id INTEGER REFERENCES {$p}media(id) ON DELETE SET NULL,
                 sort_order   INTEGER NOT NULL DEFAULT 0,
                 template     VARCHAR(255),
                 published_at DATETIME,
                 created_at   DATETIME NOT NULL,
                 updated_at   DATETIME NOT NULL
-            )
-            SQL
+            )"
         );
 
         // page_meta テーブルを作成する
-        // page_id は pages テーブルへの外部キー（ページが削除された場合はメタデータも削除する）
-        $this->connection->update(
-            <<<SQL
-            CREATE TABLE IF NOT EXISTS page_meta (
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$p}page_meta (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                page_id    INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+                page_id    INTEGER NOT NULL REFERENCES {$p}pages(id) ON DELETE CASCADE,
                 meta_key   VARCHAR(191) NOT NULL,
                 meta_value TEXT,
                 created_at DATETIME NOT NULL,
                 updated_at DATETIME NOT NULL
-            )
-            SQL
+            )"
         );
     }
 
@@ -78,10 +73,9 @@ class CreatePagesTables
      */
     public function down(): void
     {
-        // page_meta テーブルを先に削除する（pages テーブルへの外部キー制約があるため）
-        $this->connection->update('DROP TABLE IF EXISTS page_meta', []);
+        $p = $this->connection->getPrefix();
 
-        // pages テーブルを削除する
-        $this->connection->update('DROP TABLE IF EXISTS pages', []);
+        $this->connection->execute("DROP TABLE IF EXISTS {$p}page_meta");
+        $this->connection->execute("DROP TABLE IF EXISTS {$p}pages");
     }
 }

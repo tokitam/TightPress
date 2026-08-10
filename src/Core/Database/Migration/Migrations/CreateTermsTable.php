@@ -31,14 +31,13 @@ class CreateTermsTable implements MigrationInterface
      */
     public function up(): void
     {
-        $pdo = $this->connection->getPdo();
+        $prefix = $this->connection->getPrefix();
 
-        // terms テーブルを作成する（既に存在する場合はスキップ）
-        $pdo->exec(
-            'CREATE TABLE IF NOT EXISTS terms (
+        $this->connection->execute(
+            "CREATE TABLE IF NOT EXISTS {$prefix}terms (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                taxonomy_id INTEGER NOT NULL REFERENCES taxonomies(id) ON DELETE CASCADE,
-                parent_id   INTEGER REFERENCES terms(id) ON DELETE SET NULL,
+                taxonomy_id INTEGER NOT NULL REFERENCES {$prefix}taxonomies(id) ON DELETE CASCADE,
+                parent_id   INTEGER REFERENCES {$prefix}terms(id) ON DELETE SET NULL,
                 slug        VARCHAR(191) NOT NULL,
                 name        VARCHAR(255) NOT NULL,
                 description TEXT,
@@ -46,17 +45,15 @@ class CreateTermsTable implements MigrationInterface
                 created_at  DATETIME NOT NULL,
                 updated_at  DATETIME NOT NULL,
                 UNIQUE (taxonomy_id, slug)
-            )'
+            )"
         );
 
-        // taxonomy_id カラムのインデックスを作成する（タクソノミー別ターム検索の高速化）
-        $pdo->exec(
-            'CREATE INDEX IF NOT EXISTS idx_terms_taxonomy_id ON terms (taxonomy_id)'
+        $this->connection->execute(
+            "CREATE INDEX IF NOT EXISTS idx_{$prefix}terms_taxonomy_id ON {$prefix}terms (taxonomy_id)"
         );
 
-        // parent_id カラムのインデックスを作成する（子ターム一覧取得の高速化）
-        $pdo->exec(
-            'CREATE INDEX IF NOT EXISTS idx_terms_parent_id ON terms (parent_id)'
+        $this->connection->execute(
+            "CREATE INDEX IF NOT EXISTS idx_{$prefix}terms_parent_id ON {$prefix}terms (parent_id)"
         );
     }
 
@@ -67,6 +64,7 @@ class CreateTermsTable implements MigrationInterface
      */
     public function down(): void
     {
-        $this->connection->getPdo()->exec('DROP TABLE IF EXISTS terms');
+        $prefix = $this->connection->getPrefix();
+        $this->connection->execute("DROP TABLE IF EXISTS {$prefix}terms");
     }
 }
