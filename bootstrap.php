@@ -3,6 +3,7 @@
 // Composer オートローダーを読み込む
 require_once __DIR__ . '/vendor/autoload.php';
 
+use TightPress\Core\Config\DotEnv;
 use TightPress\Core\Application;
 use TightPress\Core\Config\Config;
 use TightPress\Core\Database\Connection;
@@ -11,8 +12,13 @@ use TightPress\Core\Event\EventDispatcher;
 use TightPress\Core\Event\ListenerProvider;
 use TightPress\Core\Http\Router;
 use TightPress\Core\Plugin\PluginManager;
+use TightPress\Core\Template\ThemeLoader;
+use TightPress\Core\Template\TemplateEngine;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
+
+// .env を config/ ファイルより先に読み込む
+DotEnv::load(__DIR__ . '/.env');
 
 // DIコンテナ（アプリケーション本体）を生成する
 $app = new Application();
@@ -38,6 +44,20 @@ $app->singleton(EventDispatcherInterface::class, function (Application $app) {
 
 // ルーターをシングルトンとして登録する
 $app->singleton(Router::class, fn() => new Router());
+
+// テーマローダーをシングルトンとして登録する
+$app->singleton(ThemeLoader::class, function (Application $app) {
+    $config = $app->make(Config::class);
+    return new ThemeLoader(
+        __DIR__ . '/themes',
+        $config->get('app.theme', 'twentytwentythree')
+    );
+});
+
+// テンプレートエンジンをシングルトンとして登録する
+$app->singleton(TemplateEngine::class, function (Application $app) {
+    return new TemplateEngine($app->make(ThemeLoader::class));
+});
 
 // プラグインマネージャーをシングルトンとして登録する
 $app->singleton(PluginManager::class, fn() => new PluginManager());

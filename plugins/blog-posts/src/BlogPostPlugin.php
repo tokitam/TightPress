@@ -7,6 +7,8 @@ use TightPress\Core\Plugin\PluginInterface;
 use TightPress\Core\Plugin\PluginMeta;
 use TightPress\Core\Http\Router;
 use TightPress\Core\Database\ConnectionInterface;
+use TightPress\Core\Template\TemplateEngine;
+use TightPress\Core\Template\ThemeLoader;
 use TightPress\Plugin\BlogPosts\Http\PostController;
 use TightPress\Plugin\BlogPosts\Model\PostRepository;
 use TightPress\Plugin\BlogPosts\Migration\CreatePostsTables;
@@ -43,10 +45,17 @@ class BlogPostPlugin implements PluginInterface
     public function register(Application $app): void
     {
         // PostRepository をシングルトンとして登録する
-        // ConnectionInterface はコアが既にバインド済みのため make() で取得する
         $app->singleton(PostRepository::class, function (Application $app) {
-            return new PostRepository(
-                $app->make(ConnectionInterface::class)
+            return new PostRepository($app->make(ConnectionInterface::class));
+        });
+
+        // PostController をシングルトンとして登録する
+        $app->singleton(PostController::class, function (Application $app) {
+            return new PostController(
+                $app->make(PostRepository::class),
+                $app->make(TemplateEngine::class),
+                $app->make(ThemeLoader::class),
+                $app,
             );
         });
     }

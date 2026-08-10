@@ -6,7 +6,10 @@
     },
     "autoload": {
         "psr-4": {
-            "TightPress\\": "src/"
+            "TightPress\\": "src/",
+            "TightPress\\Plugin\\BlogPosts\\": "plugins/blog-posts/src/",
+            "TightPress\\Plugin\\Pages\\": "plugins/pages/src/",
+            "TightPress\\Database\\Seeds\\": "database/seeds/"
         },
         "files": [
             "src/Compat/functions.php"
@@ -14,8 +17,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "TightPress\\Tests\\": "tests/",
-            "TightPress\\Database\\Seeds\\": "database/seeds/"
+            "TightPress\\Tests\\": "tests/"
         }
     }
 }

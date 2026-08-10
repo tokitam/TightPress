@@ -362,15 +362,14 @@ function get_the_title(int $id = 0): string
  * @param bool   $echo   true の場合は出力する、false の場合は文字列を返す
  * @return string|void $echo が false の場合はタイトル文字列を返す
  */
-function the_title(string $before = '', string $after = '', bool $echo = true): string|void
+function the_title(string $before = '', string $after = '', bool $echo = true): string
 {
     // タイトルをエスケープして前後の文字列と結合する
     $title = $before . esc_html(get_the_title()) . $after;
 
     if ($echo) {
-        // echo が true の場合は出力して終了する
+        // echo が true の場合は出力する
         echo $title;
-        return;
     }
 
     return $title;
