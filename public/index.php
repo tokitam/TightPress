@@ -1,7 +1,10 @@
 <?php
 
-// アプリケーションを初期化してDIコンテナを取得する
-$app = require __DIR__ . '/bootstrap.php';
+// プロジェクトルートと公開ディレクトリの絶対パスを定義する
+define('ROOT_DIR',   dirname(__DIR__));
+define('PUBLIC_DIR', __DIR__);
+
+$app = require ROOT_DIR . '/bootstrap.php';
 
 use TightPress\Core\Http\Request;
 use TightPress\Core\Http\Router;
