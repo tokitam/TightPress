@@ -783,8 +783,22 @@ function _get_theme_dir(): string
         $theme = 'twentytwentythree';
     }
 
-    // src/ の 2 つ上のディレクトリ（プロジェクトルート）配下の themes/ ディレクトリを使用する
-    return dirname(__DIR__, 2) . '/themes/' . $theme;
+    try {
+        $cfg      = app(TightPress\Core\Config\Config::class);
+        $themesDir = $cfg->get('app.themes_dir');
+        if ($themesDir) {
+            return rtrim($themesDir, '/') . '/' . $theme;
+        }
+    } catch (\Throwable) {
+        // fall through
+    }
+
+    // 定数が定義されていれば public/themes/ を使用する
+    if (defined('PUBLIC_DIR')) {
+        return PUBLIC_DIR . '/themes/' . $theme;
+    }
+
+    return dirname(__DIR__, 2) . '/public/themes/' . $theme;
 }
 
 /**

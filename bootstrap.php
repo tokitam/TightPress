@@ -20,6 +20,7 @@ use TightPress\Core\Http\Router;
 use TightPress\Core\Plugin\PluginManager;
 use TightPress\Core\Template\ThemeLoader;
 use TightPress\Core\Template\TemplateEngine;
+use TightPress\Compat\AssetQueue;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -64,6 +65,9 @@ $app->singleton(ThemeLoader::class, function (Application $app) {
 $app->singleton(TemplateEngine::class, function (Application $app) {
     return new TemplateEngine($app->make(ThemeLoader::class));
 });
+
+// アセットキューをシングルトンとして登録する（wp_enqueue_style / wp_enqueue_script 互換）
+$app->singleton(AssetQueue::class, fn() => new AssetQueue());
 
 // プラグインマネージャーをシングルトンとして登録する
 $app->singleton(PluginManager::class, fn() => new PluginManager());

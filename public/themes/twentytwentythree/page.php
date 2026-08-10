@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo esc_html(get_the_title()); ?> - TightPress</title>
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_uri()); ?>">
 </head>
 <body>
 <header>
