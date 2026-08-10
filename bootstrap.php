@@ -11,6 +11,8 @@ use TightPress\Core\Event\EventDispatcher;
 use TightPress\Core\Event\ListenerProvider;
 use TightPress\Core\Http\Router;
 use TightPress\Core\Plugin\PluginManager;
+use TightPress\Core\Template\ThemeLoader;
+use TightPress\Core\Template\TemplateEngine;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -38,6 +40,20 @@ $app->singleton(EventDispatcherInterface::class, function (Application $app) {
 
 // ルーターをシングルトンとして登録する
 $app->singleton(Router::class, fn() => new Router());
+
+// テーマローダーをシングルトンとして登録する
+$app->singleton(ThemeLoader::class, function (Application $app) {
+    $config = $app->make(Config::class);
+    return new ThemeLoader(
+        __DIR__ . '/themes',
+        $config->get('app.theme', 'twentytwentythree')
+    );
+});
+
+// テンプレートエンジンをシングルトンとして登録する
+$app->singleton(TemplateEngine::class, function (Application $app) {
+    return new TemplateEngine($app->make(ThemeLoader::class));
+});
 
 // プラグインマネージャーをシングルトンとして登録する
 $app->singleton(PluginManager::class, fn() => new PluginManager());

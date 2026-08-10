@@ -32,7 +32,7 @@ class CreatePagesTables
         // pages テーブルを作成する
         // parent_id は自己参照外部キー（親ページが削除された場合は NULL にする）
         // slug は固定ページのURLスラッグで一意制約を持つ
-        $this->connection->statement(
+        $this->connection->update(
             <<<SQL
             CREATE TABLE IF NOT EXISTS pages (
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +54,7 @@ class CreatePagesTables
 
         // page_meta テーブルを作成する
         // page_id は pages テーブルへの外部キー（ページが削除された場合はメタデータも削除する）
-        $this->connection->statement(
+        $this->connection->update(
             <<<SQL
             CREATE TABLE IF NOT EXISTS page_meta (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,9 +79,9 @@ class CreatePagesTables
     public function down(): void
     {
         // page_meta テーブルを先に削除する（pages テーブルへの外部キー制約があるため）
-        $this->connection->statement('DROP TABLE IF EXISTS page_meta');
+        $this->connection->update('DROP TABLE IF EXISTS page_meta', []);
 
         // pages テーブルを削除する
-        $this->connection->statement('DROP TABLE IF EXISTS pages');
+        $this->connection->update('DROP TABLE IF EXISTS pages', []);
     }
 }

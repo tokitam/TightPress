@@ -7,6 +7,7 @@ use TightPress\Core\Plugin\PluginInterface;
 use TightPress\Core\Plugin\PluginMeta;
 use TightPress\Core\Http\Router;
 use TightPress\Core\Database\ConnectionInterface;
+use TightPress\Core\Template\TemplateEngine;
 use TightPress\Plugin\Pages\Http\PageController;
 use TightPress\Plugin\Pages\Model\PageRepository;
 use TightPress\Plugin\Pages\Migration\CreatePagesTables;
@@ -46,10 +47,16 @@ class PagesPlugin implements PluginInterface
     public function register(Application $app): void
     {
         // PageRepository をシングルトンとして登録する
-        // ConnectionInterface はコアが既にバインド済みのため make() で取得する
         $app->singleton(PageRepository::class, function (Application $app) {
-            return new PageRepository(
-                $app->make(ConnectionInterface::class)
+            return new PageRepository($app->make(ConnectionInterface::class));
+        });
+
+        // PageController をシングルトンとして登録する
+        $app->singleton(PageController::class, function (Application $app) {
+            return new PageController(
+                $app->make(PageRepository::class),
+                $app->make(TemplateEngine::class),
+                $app,
             );
         });
     }
